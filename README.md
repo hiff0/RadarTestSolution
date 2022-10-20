@@ -59,7 +59,7 @@ let column = table.column();
 let row = table.row()
 ```
 ## setData
-`setData()` устанавливает данные в определенную яцейку или заменяет все данные таблица.
+`setData()` устанавливает данные в определенную ячейку или заменяет все данные таблицыы.
 ### Синтаксис
 ```
 table.setData(data, columnCount, rowCount)
