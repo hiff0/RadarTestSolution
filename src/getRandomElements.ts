@@ -11,9 +11,9 @@
  */
 
 function getRandomElements(array: string[], numOfItems: number): string[] {
-    // если количество элементов выходного массива больше или равно исходному, 
+    // если количество элементов выходного массива больше исходного, 
     // то возвращаем исходный массив
-    if (numOfItems >= array.length) {
+    if (numOfItems > array.length) {
         return array;
     }
 
@@ -22,17 +22,17 @@ function getRandomElements(array: string[], numOfItems: number): string[] {
         return [];
     }
 
-    const randomArray: string[] = []; // результирующий массив
+    const randomArray: string[] = array.sort(() => 0.5 - Math.random()).slice(0, numOfItems);
 
-    for (let i = 0; i < numOfItems; i += 1) {
-        let randomIndex: number = Math.round(Math.random() * (array.length - 1)); // рандомный индекс
-        let currentEl = array[randomIndex]; // рандомный элемент из массива
-        while (randomArray.includes(currentEl)) { //если в результирующем массиве есть такой элемент, то берем другой
-            randomIndex = Math.round(Math.random() * (array.length - 1));
-            currentEl = array[randomIndex];
-        }
-        randomArray.push(currentEl);
-    }
+    // for (let i = 0; i < numOfItems; i += 1) {
+    //     let randomIndex: number = Math.round(Math.random() * (array.length - 1)); // рандомный индекс
+    //     let currentEl = array[randomIndex]; // рандомный элемент из массива
+    //     while (randomArray.includes(currentEl)) { //если в результирующем массиве есть такой элемент, то берем другой
+    //         randomIndex = Math.round(Math.random() * (array.length - 1));
+    //         currentEl = array[randomIndex];
+    //     }
+    //     randomArray.push(currentEl);
+    // }
 
     return randomArray;
 }
