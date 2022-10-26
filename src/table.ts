@@ -1,20 +1,21 @@
 import { type } from "os";
 
-function createArr(startArr: any[], columnCount: number, rowCount: number) {
-    const resArr = startArr;
-    for (let i = 0; i < rowCount; i += 1) {
-        resArr.push([]);
-        for (let j = 0; j < columnCount; j += 1) {
-            resArr[i][j] = null;
+function getMaxRowLength(dataArray: (string | number)[][]): number[] {
+    let maxRowLength = dataArray[0].length;
+    let maxRowIndex = 0;
+    for (const row of dataArray) {
+        if (row.length > maxRowLength) {
+            maxRowLength = row.length;
+            maxRowIndex = dataArray.indexOf(row);
         }
     }
-    return resArr;
+    return [maxRowLength, maxRowIndex];
 }
 
-function insert(array: any[], element: any, index: number): any[] {
+function insert(array: any[], element: string | string[], index: number): any[] {
     if (index <= array.length && index >= 0) {
         const arrayCopy = array;
-        arrayCopy.push('');
+        arrayCopy.push(' ');
         let currentEl: any = arrayCopy[index];
         for (let i = index + 1; i < arrayCopy.length; i += 1) {
             let temp: any = currentEl;
@@ -28,43 +29,56 @@ function insert(array: any[], element: any, index: number): any[] {
         return array;
     }
 }
-// Класс колонки
-class Column {
-    private _count: number;
-
-    constructor(columnCount: number = 0) {
-        this._count = columnCount;
-    }
-
-
-    get count(): number {
-        return this._count;
-    }
-}
-
-// Класс строки
-class Row {
-    private _count: number;
-
-    constructor(rowCount: number = 0) {
-        this._count = rowCount;
-    }
-
-    get count(): number {
-        return this._count;
-    }
-}
 
 class Table {
 
     private _column: number;
     private _row: number;
-    private _data: any[];
+    private _data: (string | number)[][];
 
-    constructor(columnCount: number = 0, rowCount: number = 0, data: any[] = createArr([], columnCount, rowCount)) {
-        this._column = new Column(columnCount).count;
-        this._row = new Row(rowCount).count;
-        this._data = data;
+    constructor(columnCount: number = 0, rowCount: number = 0, data: (string | number)[][] = [[]]) {
+        if (rowCount < data.length) {
+            this._row = data.length;
+        } else {
+            this._row = rowCount;
+        }
+
+        const [maxRowLength, maxRowIndex] = getMaxRowLength(data);
+        if (columnCount < maxRowLength) {
+            this._column = data[maxRowIndex].length;
+        } else {
+            this._column = columnCount;
+        }
+        this._data = this.setArray(this._column, this._row, data);
+    }
+
+    private setArray(columnCount: number, rowCount: number, data: (string | number)[][] = [[]]) {
+        const dataArr: (string | number)[][] = data;
+
+        if (dataArr.length !== 1 && dataArr[0].length !== 0) {
+            for (let i = 0; i < rowCount; i += 1) {
+                if (i >= dataArr.length) {
+                    dataArr.push([]);
+                }
+                for (let j = 0; j < columnCount; j += 1) {
+                    if (j >= dataArr[i].length) {
+                        dataArr[i][j] = ' ';
+                    }
+                }
+            }
+            return dataArr;
+        }
+
+        for (let i = 0; i < rowCount - 1; i += 1) {
+            dataArr.push([]);
+        }
+
+        for (const row of dataArr) {
+            for (let i = 0; i < columnCount; i += 1) {
+                row.push(' ');
+            }
+        }
+        return dataArr;
     }
 
     print(): void {
@@ -73,8 +87,8 @@ class Table {
         for (let i = 0; i < this._column; i += 1) {
             let maxLength = `${this._data[0][i]}`.length;
             for (let j = 1; j < this._row; j += 1) {
-                if (`${this._data[j][i]}`.length > maxLength) {
-                    maxLength = this._data[j][i].length;
+                if (`${this._data[j][i]} `.length > maxLength) {
+                    maxLength = `${this._data[j][i]} `.length;
                 }
             }
             maxElementLenght.push(maxLength);
@@ -85,7 +99,7 @@ class Table {
 
         for (let i = 0; i < this._column; i += 1) {
             for (let j = 0; j < this._row; j += 1) {
-                const tab = ' '.repeat(maxElementLenght[i] - `${this._data[j][i]}`.length + 1);
+                const tab = ' '.repeat(maxElementLenght[i] - `${this._data[j][i]} `.length + 1);
                 dataTabs[j][i] += tab;
             }
         }
@@ -113,15 +127,20 @@ class Table {
                 if (column < 0 || row < 0 || column > this._column || row > this._row) {
                     throw new Error('Такой ячейки не существует');
                 }
-                const dataToString: string = `${data}`;
+                const dataToString: string = `${data} `;
                 this._data[row - 1][column - 1] = dataToString;
             } catch (e) {
                 console.log(e);
             }
         } else {
-            this._data = data;
-            this._row = data.length;
-            this._column = data[0].length;
+            if (this._row < data.length) {
+                this._row = data.length;
+            }
+            const [maxRowLength, maxRowIndex] = getMaxRowLength(data);
+            if (this._column < maxRowLength) {
+                this._column = data[maxRowIndex].length;
+            }
+            this._data = this.setArray(this._column, this._row, data);
         }
     }
 
@@ -131,23 +150,23 @@ class Table {
             for (let i = 0; i < columnCount; i += 1) {
                 if (index) {
                     for (let row of this._data) {
-                        row.push(null);
+                        row.push(' ');
                     }
                 } else {
                     for (let row of this._data) {
-                        row.unshift(null);
+                        row.unshift(' ');
                     }
                 }
-                this._column += columnCount;
+                this._column += 1;
             }
         } else if (index > this._column + 1 || index < 1) {
-            console.log('Количество колонок меньше или больше, чем входной индекс')
+            console.log('Ошибка добавления колонки(ок). Количество колонок меньше или больше, чем входной индекс');
         } else {
             for (let i = 0; i < columnCount; i += 1) {
                 for (const row of this._data) {
-                    insert(row, null, index - 1);
+                    insert(row, ' ', index - 1);
                 }
-                this._column += columnCount;
+                this._column += 1;
             }
         }
     }
@@ -158,30 +177,30 @@ class Table {
                 if (index) {
                     const puchArr = [];
                     for (let i = 0; i < this._data[0].length; i += 1) {
-                        puchArr.push(null);
+                        puchArr.push(' ');
                     }
 
                     this._data.push(puchArr);
                 } else {
                     const puchArr = [];
                     for (let i = 0; i < this._data[0].length; i += 1) {
-                        puchArr.push(null);
+                        puchArr.push(' ');
                     }
 
                     this._data.unshift(puchArr);
                 }
-                this._row += rowCount;
+                this._row += 1;
             }
         } else if (index > this._row + 1 || index < 1) {
-            console.log('Количество строк меньше или больше, чем входной индекс');
+            console.log('Ошибка добавления строки. Количество строк меньше или больше, чем входной индекс');
         } else {
             const pushRow = [];
             while (pushRow.length < this._column) {
-                pushRow.push(null);
+                pushRow.push(' ');
             }
             for (let i = 0; i < rowCount; i += 1) {
                 this._data = insert(this._data, pushRow, index - 1);
-                this._row += rowCount;
+                this._row += 1;
             }
         }
     }
@@ -224,7 +243,7 @@ class Table {
                     this._row -= 1;
                 }
             } else {
-                for (let i = 0; i < rowCount; i + 1) {
+                for (let i = 0; i < rowCount; i += 1) {
                     this._data.shift();
                     this._row -= 1;
                 }
@@ -239,7 +258,5 @@ class Table {
         }
     }
 }
-
-
 
 export default Table;

@@ -11,28 +11,24 @@
  */
 
 function getRandomElements(array: string[], numOfItems: number): string[] {
-    // если количество элементов выходного массива больше исходного, 
-    // то возвращаем исходный массив
+
     if (numOfItems > array.length) {
-        return array;
+        numOfItems = array.length;
     }
 
-    // если количество выходных элементов <= 0, то просто вывыодим пустой массив
     if (numOfItems <= 0) {
         return [];
     }
 
-    const randomArray: string[] = array.sort(() => 0.5 - Math.random()).slice(0, numOfItems);
+    const arrayCopy = array;
+    const randomArray: string[] = [];
 
-    // for (let i = 0; i < numOfItems; i += 1) {
-    //     let randomIndex: number = Math.round(Math.random() * (array.length - 1)); // рандомный индекс
-    //     let currentEl = array[randomIndex]; // рандомный элемент из массива
-    //     while (randomArray.includes(currentEl)) { //если в результирующем массиве есть такой элемент, то берем другой
-    //         randomIndex = Math.round(Math.random() * (array.length - 1));
-    //         currentEl = array[randomIndex];
-    //     }
-    //     randomArray.push(currentEl);
-    // }
+    for (let i = 0; i < numOfItems; i += 1) {
+        let randomIndex: number = Math.round(Math.random() * (arrayCopy.length - 1)); // рандомный индекс
+        let currentEl = arrayCopy[randomIndex]; // рандомный элемент из массива
+        arrayCopy.splice(randomIndex, 1);
+        randomArray.push(currentEl);
+    }
 
     return randomArray;
 }
