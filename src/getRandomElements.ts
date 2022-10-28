@@ -24,8 +24,8 @@ function getRandomElements(array: string[], numOfItems: number): string[] {
     const randomArray: string[] = [];
 
     for (let i = 0; i < numOfItems; i += 1) {
-        let randomIndex: number = Math.round(Math.random() * (arrayCopy.length - 1)); // рандомный индекс
-        let currentEl = arrayCopy[randomIndex]; // рандомный элемент из массива
+        let randomIndex: number = Math.round(Math.random() * (arrayCopy.length - 1));
+        let currentEl = arrayCopy[randomIndex];
         arrayCopy.splice(randomIndex, 1);
         randomArray.push(currentEl);
     }
