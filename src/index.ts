@@ -23,6 +23,4 @@ table.setData(tableArr);
 table.addColumn(3, 4);
 table.addRow(2, 4);
 table.setData('Отчество', 4, 1);
-table.removeRow(2, 4);
-table.removeColumn(3, 4);
 table.print();

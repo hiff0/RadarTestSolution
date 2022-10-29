@@ -13,7 +13,7 @@ export default function getArrayOfUniqueValues(length: number): string[] {
     if(!length) return [];
     if(length > UNIQUE_ARRAY_MAX_LENGTH) length = UNIQUE_ARRAY_MAX_LENGTH;
 
-    let arrayTemplate: string[] = [];
+    const arrayTemplate: string[] = [];
     for (let i = 0; i < length; i++) {
         addUniqueValue(arrayTemplate);
     }

@@ -4,7 +4,7 @@
  * @param elem - искомый элемент
  */
 export default function isContains<T>(arr: T[], elem: T): boolean {
-    for (var i = 0; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         if (arr[i] === elem) {
             return true;
         }

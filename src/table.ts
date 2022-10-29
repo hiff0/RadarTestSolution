@@ -1,34 +1,4 @@
-import { type } from "os";
-
-function getMaxRowLength(dataArray: (string | number)[][]): number[] {
-    let maxRowLength = dataArray[0].length;
-    let maxRowIndex = 0;
-    for (const row of dataArray) {
-        if (row.length > maxRowLength) {
-            maxRowLength = row.length;
-            maxRowIndex = dataArray.indexOf(row);
-        }
-    }
-    return [maxRowLength, maxRowIndex];
-}
-
-function insert(array: any[], element: string | string[], index: number): any[] {
-    if (index <= array.length && index >= 0) {
-        const arrayCopy = array;
-        arrayCopy.push(' ');
-        let currentEl: any = arrayCopy[index];
-        for (let i = index + 1; i < arrayCopy.length; i += 1) {
-            let temp: any = currentEl;
-            currentEl = arrayCopy[i];
-            arrayCopy[i] = temp;
-        }
-        arrayCopy[index] = element;
-        return arrayCopy;
-    } else {
-        console.log('Индекс втавки меньше нуля или больше размера массива');
-        return array;
-    }
-}
+import getMaxRowLength from "./utils/getMaxRowLength";
 
 class Table {
 
@@ -36,7 +6,7 @@ class Table {
     private _row: number;
     private _data: (string | number)[][];
 
-    constructor(columnCount: number = 0, rowCount: number = 0, data: (string | number)[][] = [[]]) {
+    constructor(columnCount = 0, rowCount = 0, data: (string | number)[][] = [[]]) {
         if (rowCount < data.length) {
             this._row = data.length;
         } else {
@@ -121,18 +91,18 @@ class Table {
         return this._row;
     }
 
-    setData(data: any, column?: number, row?: number): void {
-        if (typeof column !== 'undefined' && typeof row !== 'undefined') {
+    setData(data: ((string | number)[][] | string), column?: number, row?: number): void {
+        if (typeof column !== 'undefined' && typeof row !== 'undefined' && typeof data === 'string') {
             try {
                 if (column < 0 || row < 0 || column > this._column || row > this._row) {
                     throw new Error('Такой ячейки не существует');
                 }
-                const dataToString: string = `${data} `;
+                const dataToString = `${data} `;
                 this._data[row - 1][column - 1] = dataToString;
             } catch (e) {
                 console.log(e);
             }
-        } else {
+        } else if (Array.isArray(data)) {
             if (this._row < data.length) {
                 this._row = data.length;
             }
@@ -141,37 +111,40 @@ class Table {
                 this._column = data[maxRowIndex].length;
             }
             this._data = this.setArray(this._column, this._row, data);
+        } else {
+            throw new Error('Первый аргумент, не массив, введите номер колонки и номер строки или передайте первым аргументом массив');
         }
     }
 
-    addColumn(columnCount: number = 1, index: number | boolean = true): void {
+    addColumn(columnCount = 1, index: number | boolean = true): void {
 
         if (typeof index === 'boolean') {
             for (let i = 0; i < columnCount; i += 1) {
                 if (index) {
-                    for (let row of this._data) {
+                    for (const row of this._data) {
                         row.push(' ');
                     }
                 } else {
-                    for (let row of this._data) {
+                    for (const row of this._data) {
                         row.unshift(' ');
                     }
                 }
                 this._column += 1;
             }
         } else if (index > this._column + 1 || index < 1) {
-            console.log('Ошибка добавления колонки(ок). Количество колонок меньше или больше, чем входной индекс');
+            throw new Error('Ошибка добавления колонки(ок). Количество колонок меньше или больше, чем входной индекс');
         } else {
             for (let i = 0; i < columnCount; i += 1) {
                 for (const row of this._data) {
-                    insert(row, ' ', index - 1);
+                    // insert(row, ' ', index - 1);
+                    row.splice(index - 1, 0, ' ');
                 }
                 this._column += 1;
             }
         }
     }
 
-    addRow(rowCount: number = 1, index: number | boolean = true): void {
+    addRow(rowCount = 1, index: number | boolean = true): void {
         if (typeof index === 'boolean') {
             for (let i = 0; i < rowCount; i += 1) {
                 if (index) {
@@ -192,20 +165,20 @@ class Table {
                 this._row += 1;
             }
         } else if (index > this._row + 1 || index < 1) {
-            console.log('Ошибка добавления строки. Количество строк меньше или больше, чем входной индекс');
+            throw new Error('Ошибка добавления строки. Количество строк меньше или больше, чем входной индекс');
         } else {
             const pushRow = [];
             while (pushRow.length < this._column) {
                 pushRow.push(' ');
             }
             for (let i = 0; i < rowCount; i += 1) {
-                this._data = insert(this._data, pushRow, index - 1);
+                this._data.splice(index - 1, 0, pushRow);
                 this._row += 1;
             }
         }
     }
 
-    removeColumn(columnCount: number = 1, index: number | boolean = true) {
+    removeColumn(columnCount = 1, index: number | boolean = true) {
 
         if (typeof index === 'boolean') {
             if (index) {
@@ -224,7 +197,7 @@ class Table {
                 }
             }
         } else if (index > this._column || index < 1 || columnCount + index > this._column) {
-            console.log('Конка не существует');
+            throw new Error('Конка не существует');
         } else {
             for (let i = 0; i < columnCount; i += 1) {
                 for (const row of this._data) {
@@ -235,7 +208,7 @@ class Table {
         }
     }
 
-    removeRow(rowCount: number = 1, index: number | boolean = true): void {
+    removeRow(rowCount = 1, index: number | boolean = true): void {
         if (typeof index === 'boolean') {
             if (index) {
                 for (let i = 0; i < rowCount; i += 1) {
@@ -249,7 +222,7 @@ class Table {
                 }
             }
         } else if (index > this._column || index < 1 || rowCount + index > this._row) {
-            console.log('Строка не существует')
+            throw new Error('Строка не существует');
         } else {
             for (let i = 0; i < rowCount; i += 1) {
                 this._data.splice(index - 1, 1);
