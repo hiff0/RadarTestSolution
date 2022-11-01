@@ -7,7 +7,7 @@ class Table {
     private _row: number;
     private _data: (string | number)[][];
 
-    constructor(columnCount = 0, rowCount = 0, data: (string | number)[][] = [[]]) {
+    constructor(columnCount = 1, rowCount = 1, data: (string | number)[][] = [[]]) {
         this._row = rowCount < data.length ? data.length : rowCount;
         const [maxRowLength, maxRowIndex] = getMaxRowLength(data);
         this._column = columnCount < maxRowLength ? data[maxRowIndex].length : columnCount;
@@ -93,7 +93,6 @@ class Table {
     }
 
     addColumn(columnCount = 1, index: number | boolean = true): void {
-
         if (typeof index === 'boolean') {
             for (let i = 0; i < columnCount; i += 1) {
                 if (index) {
@@ -143,11 +142,11 @@ class Table {
         } else if (index > this._row + 1 || index < 1) {
             throw new Error('Ошибка добавления строки. Количество строк меньше или больше, чем входной индекс');
         } else {
-            const pushRow = [];
-            while (pushRow.length < this._column) {
-                pushRow.push(' ');
-            }
             for (let i = 0; i < rowCount; i += 1) {
+                const pushRow = [];
+                while (pushRow.length < this._column) {
+                    pushRow.push(' ');
+                }
                 this._data.splice(index - 1, 0, pushRow);
                 this._row += 1;
             }
@@ -155,7 +154,6 @@ class Table {
     }
 
     removeColumn(columnCount = 1, index: number | boolean = true) {
-
         if (typeof index === 'boolean') {
             if (index) {
                 for (let i = 0; i < columnCount; i += 1) {
@@ -173,10 +171,11 @@ class Table {
                 }
             }
         } else if (index > this._column || index < 1 || columnCount + index > this._column) {
-            throw new Error('Конка не существует');
+            console.log('Конка не существует');
         } else {
             for (let i = 0; i < columnCount; i += 1) {
                 for (const row of this._data) {
+                    console.log(row);
                     row.splice(index - 1, 1);
                 }
                 this._column -= 1;
