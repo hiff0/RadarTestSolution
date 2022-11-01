@@ -1,4 +1,5 @@
 import getMaxRowLength from "./utils/getMaxRowLength";
+import getMaxElementsLength from "./utils/getMaxElementsLegth";
 
 class Table {
 
@@ -7,18 +8,9 @@ class Table {
     private _data: (string | number)[][];
 
     constructor(columnCount = 0, rowCount = 0, data: (string | number)[][] = [[]]) {
-        if (rowCount < data.length) {
-            this._row = data.length;
-        } else {
-            this._row = rowCount;
-        }
-
+        this._row = rowCount < data.length ? data.length : rowCount;
         const [maxRowLength, maxRowIndex] = getMaxRowLength(data);
-        if (columnCount < maxRowLength) {
-            this._column = data[maxRowIndex].length;
-        } else {
-            this._column = columnCount;
-        }
+        this._column = columnCount < maxRowLength ? data[maxRowIndex].length : columnCount;
         this._data = this.setArray(this._column, this._row, data);
     }
 
@@ -52,32 +44,16 @@ class Table {
     }
 
     print(): void {
-        //Ищем максимальную длину слова в каждом столбце
-        const maxElementLenght: number[] = [];
-        for (let i = 0; i < this._column; i += 1) {
-            let maxLength = `${this._data[0][i]}`.length;
-            for (let j = 1; j < this._row; j += 1) {
-                if (`${this._data[j][i]} `.length > maxLength) {
-                    maxLength = `${this._data[j][i]} `.length;
-                }
-            }
-            maxElementLenght.push(maxLength);
-        }
+        const maxElementsLenghtInRow: number[] = getMaxElementsLength(this._data, this._column, this._row);
+        const dataTabs = this._data.map((row, rowIndex) => row.map((column, columnIndex) => {
+            const tab = ' '.repeat(maxElementsLenghtInRow[columnIndex] - `${this._data[rowIndex][columnIndex]}`.length + 1);
+            return column += tab;
+        }))
 
-        // Записываем количество табов для каждого элемента
-        const dataTabs = this._data;
-
-        for (let i = 0; i < this._column; i += 1) {
-            for (let j = 0; j < this._row; j += 1) {
-                const tab = ' '.repeat(maxElementLenght[i] - `${this._data[j][i]} `.length + 1);
-                dataTabs[j][i] += tab;
-            }
-        }
-
-        const separator = '='.repeat((dataTabs[0].join(' | ') + '| ' + ' |').length)
+        const separator = '='.repeat((dataTabs[0].join(' | ') + '| ' + ' |').length);
         // Вывод таблицы
         console.log(separator);
-        for (const row of this._data) {
+        for (const row of dataTabs) {
             console.log('| ' + row.join(' | ') + ' |');
             console.log(separator);
         }
